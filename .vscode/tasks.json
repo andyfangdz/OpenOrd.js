@@ -1,0 +1,30 @@
+{
+    "version": "0.1.0",
+    "command": "sh",
+    "args": ["-c"],
+    "isShellCommand": true,
+    "showOutput": "always",
+    "suppressTaskName": true,
+    "tasks": [
+        {
+            "taskName": "fullmake",
+            "args": ["cd build && emcmake cmake .. && make"]
+        },
+        {
+            "taskName": "cmake",
+            "args": ["cd build && emcmake cmake .."]
+        },
+        {
+            "taskName": "make",
+            "args": ["cd build && make"]
+        },
+        {
+            "taskName": "clean",
+            "args": ["cd build && rm -rf *"]
+        },
+        {
+            "taskName": "build",
+            "args": ["cd build && rm -rf * && emcmake cmake .. && make"]
+        }
+    ]
+}

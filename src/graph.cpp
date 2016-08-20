@@ -17,6 +17,47 @@ using namespace std;
 #include <mpi.h>
 #endif
 
+void graph::set_params(uintptr_t paramsPtr) {
+    const float* params = reinterpret_cast<float*>(paramsPtr);
+    int cursor = 0;
+    
+    iterations = (int)params[cursor++];
+    temperature = params[cursor++];
+    attraction = params[cursor++];
+    damping_mult = params[cursor++];
+
+    liquid.iterations = (int)params[cursor++];
+    liquid.temperature = params[cursor++];
+    liquid.attraction = params[cursor++];
+    liquid.damping_mult = params[cursor++];
+    liquid.time_elapsed = 0;
+
+    expansion.iterations = (int)params[cursor++];
+    expansion.temperature = params[cursor++];
+    expansion.attraction = params[cursor++];
+    expansion.damping_mult = params[cursor++];
+    expansion.time_elapsed = 0;
+
+    cooldown.iterations = (int)params[cursor++];
+    cooldown.temperature = params[cursor++];
+    cooldown.attraction = params[cursor++];
+    cooldown.damping_mult = params[cursor++];
+    cooldown.time_elapsed = 0;
+
+    crunch.iterations = (int)params[cursor++];
+    crunch.temperature = params[cursor++];
+    crunch.attraction = params[cursor++];
+    crunch.damping_mult = params[cursor++];
+    crunch.time_elapsed = 0;
+
+    simmer.iterations = (int)params[cursor++];
+    simmer.temperature = params[cursor++];
+    simmer.attraction = params[cursor++];
+    simmer.damping_mult = params[cursor++];
+    simmer.time_elapsed = 0;
+}
+
+
 // constructor -- initializes the schedule variables (as in 
 // graph constructor)
 

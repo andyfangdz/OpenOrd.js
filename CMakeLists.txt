@@ -7,6 +7,10 @@ INCLUDE_DIRECTORIES(
         /Users/andy/Downloads/emsdk_portable/emscripten/1.35.0/system/include
 )
 
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
 set(SOURCE_FILES
     src/DensityGrid.cpp
     src/DensityGrid.h
@@ -17,4 +21,4 @@ set(SOURCE_FILES
     src/Node.h)
 
 
-add_executable(OpenOrd.js ${SOURCE_FILES})
+add_executable(OpenOrd ${SOURCE_FILES})

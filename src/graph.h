@@ -48,6 +48,8 @@ public:
 
     void get_positions_js(emscripten::val onComplete);
 
+    void set_params(uintptr_t paramsPtr);
+
     // Con/Decon
     graph(int proc_id, int tot_procs, char *int_file);
 
