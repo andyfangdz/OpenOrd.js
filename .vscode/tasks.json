@@ -25,6 +25,10 @@
         {
             "taskName": "build",
             "args": ["cd build && rm -rf * && emcmake cmake .. && make"]
+        },
+        {
+            "taskName": "dist",
+            "args": ["cd build && rm -rf * && emcmake cmake .. && make && cd .. && rm -rf dist && mkdir dist && cp build/bin/* dist"]
         }
     ]
 }
