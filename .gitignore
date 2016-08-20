@@ -1,5 +1,6 @@
 .idea/
-
+bin/
+build/
 # Logs
 logs
 *.log

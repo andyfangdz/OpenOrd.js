@@ -1,3 +1,0 @@
-/Users/andy/Downloads/OpenOrd/build/CMakeFiles/edit_cache.dir
-/Users/andy/Downloads/OpenOrd/build/CMakeFiles/rebuild_cache.dir
-/Users/andy/Downloads/OpenOrd/build/CMakeFiles/OpenOrd.js.dir
