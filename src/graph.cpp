@@ -57,6 +57,42 @@ void graph::set_params(uintptr_t paramsPtr) {
     simmer.time_elapsed = 0;
 }
 
+void graph::get_params(emscripten::val onComplete){
+    float result_buffer[24];
+    int cursor = 0;
+
+    result_buffer[cursor++] = iterations;
+    result_buffer[cursor++] = temperature;
+    result_buffer[cursor++] = attraction;
+    result_buffer[cursor++] = damping_mult;
+
+    result_buffer[cursor++] = liquid.iterations;
+    result_buffer[cursor++] = liquid.temperature;
+    result_buffer[cursor++] = liquid.attraction;
+    result_buffer[cursor++] = liquid.damping_mult;
+
+    result_buffer[cursor++] = expansion.iterations;
+    result_buffer[cursor++] = expansion.temperature;
+    result_buffer[cursor++] = expansion.attraction;
+    result_buffer[cursor++] = expansion.damping_mult;
+
+    result_buffer[cursor++] = cooldown.iterations;
+    result_buffer[cursor++] = cooldown.temperature;
+    result_buffer[cursor++] = cooldown.attraction;
+    result_buffer[cursor++] = cooldown.damping_mult;
+
+    result_buffer[cursor++] = crunch.iterations;
+    result_buffer[cursor++] = crunch.temperature;
+    result_buffer[cursor++] = crunch.attraction;
+    result_buffer[cursor++] = crunch.damping_mult;
+
+    result_buffer[cursor++] = simmer.iterations;
+    result_buffer[cursor++] = simmer.temperature;
+    result_buffer[cursor++] = simmer.attraction;
+    result_buffer[cursor++] = simmer.damping_mult;
+
+    onComplete(emscripten::memory_view<float>(24, result_buffer));
+}
 
 // constructor -- initializes the schedule variables (as in 
 // graph constructor)
@@ -115,7 +151,7 @@ void graph::init(uintptr_t edgesPtr, uintptr_t weightsPtr) {
     from_array(edges, weights, edgeCount);
 
     // populate node positions and ids
-    emprintf("%d", num_nodes);
+    //emprintf("%d", num_nodes);
     positions.reserve(num_nodes);
     map<int, int>::iterator cat_iter;
     for (cat_iter = id_catalog.begin();
@@ -220,7 +256,7 @@ void graph::read_array(const int *edges, const float *weights, int edgeCount) {
     for (int i = 0; i < edgeCount; i++) {
         id1 = edges[i * 2 + 0];
         id2 = edges[i * 2 + 1];
-        emprintf("%d, %d", id1, id2);
+        //emprintf("%d, %d", id1, id2);
         edge_weight = weights[i];
         edge_weight /= highest_sim;
         edge_weight = edge_weight * fabs(edge_weight);
@@ -1267,6 +1303,6 @@ void graph::get_positions_js(emscripten::val onComplete) {
 }
 
 int main() {
-    cout << "this is a graph. lol" <<endl;
+    cout << "this is a graph. lol. changed. lol123" <<endl;
     return 0;
 }

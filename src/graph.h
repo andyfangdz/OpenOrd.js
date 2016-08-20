@@ -49,6 +49,7 @@ public:
     void get_positions_js(emscripten::val onComplete);
 
     void set_params(uintptr_t paramsPtr);
+    void get_params(emscripten::val onComplete);
 
     // Con/Decon
     graph(int proc_id, int tot_procs, char *int_file);
@@ -124,6 +125,8 @@ EMSCRIPTEN_BINDINGS(graph_bindings) {
             .constructor<int>()
             .function("init", &graph::init)
             .function("run", &graph::run)
-            .function("get_positions_js", &graph::get_positions_js);
+            .function("get_positions_js", &graph::get_positions_js)
+            .function("set_params", &graph::set_params)
+            .function("get_params", &graph::get_params);
 }
 #endif

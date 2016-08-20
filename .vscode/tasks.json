@@ -23,12 +23,12 @@
             "args": ["cd build && rm -rf *"]
         },
         {
-            "taskName": "build",
+            "taskName": "builds",
             "args": ["cd build && rm -rf * && emcmake cmake .. && make"]
         },
         {
-            "taskName": "dist",
-            "args": ["cd build && rm -rf * && emcmake cmake .. && make && cd .. && rm -rf dist && mkdir dist && cp build/bin/* dist"]
+            "taskName": "build",
+            "args": ["rm -rf build && mkdir build && cd build && emcmake cmake .. && make && cd .. && rm -rf dist && mkdir dist && cp build/bin/* dist && cp build/bin/* docs"]
         }
     ]
 }

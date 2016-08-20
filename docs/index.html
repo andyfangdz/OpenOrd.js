@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <style>
+
+        .links line {
+            stroke: #999;
+            stroke-opacity: 0.6;
+        }
+
+        .nodes circle {
+            stroke: #fff;
+            stroke-width: 1.5px;
+        }
+
+        .left-control {
+            box-sizing: border-box;
+            width: 300px;
+            height: 100vh;
+            float: left;
+            overflow-y: auto;
+            box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .start-btn {
+            margin-bottom: 20px;
+        }
+
+        .right-content {
+            float: left;
+            position: relative;
+            height: 100vh;
+            width: calc(100vw - 300px);
+        }
+
+    </style>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/css/materialize.min.css">
+
+    <!-- Compiled and minified JavaScript -->
+    <script>var Module = { TOTAL_MEMORY:1073741824 };</script>
+    <script type="text/javascript" src="OpenOrd.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+    <script src="https://cdn.rawgit.com/emeeks/gexf-parser/master/src/parser.js"></script>
+
+</head>
+<body>
+<div class="left-control">
+    <h4>OpenOrd Parameters</h4>
+    <button onclick="start()" class="waves-effect waves-light btn start-btn"><i class="material-icons left">cloud</i>Start
+        OpenOrd
+    </button>
+    <br/>
+    <button onclick="update()" class="waves-effect waves-light btn">Update Params</button>
+    <p>Iterations: <span id="its">0</span></p>
+    <hr/>
+    <div class="input-field col s12">
+        <select id="presents-select">
+            <option value="" disabled selected>Select Preset</option>
+        </select>
+    </div>
+    <p>Initial</p>
+    <div class="input-field col s6">
+        <input id="initial-iterations" type="text">
+        <label for="initial-iterations">Initial Iterations</label>
+    </div>
+    <div class="input-field col s6">
+        <input id="initial-temperature" type="text">
+        <label for="initial-temperature">Initial Temperature</label>
+    </div>
+    <div class="input-field col s6">
+        <input id="initial-attraction" type="text">
+        <label for="initial-attraction">Initial Attraction</label>
+    </div>
+    <div class="input-field col s6">
+        <input id="initial-dampingmult" type="text">
+        <label for="initial-dampingmult">Initial Damping Multiplier</label>
+    </div>
+    <hr/>
+    <p>Liquid</p>
+    <div class="input-field col s6">
+        <input id="liquid-iterations" type="text">
+        <label for="liquid-iterations">Liquid Iterations</label>
+    </div>
+    <div class="input-field col s6">
+        <input id="liquid-temperature" type="text">
+        <label for="liquid-temperature">Liquid Temperature</label>
+    </div>
+    <div class="input-field col s6">
+        <input id="liquid-attraction" type="text">
+        <label for="liquid-attraction">Liquid Attraction</label>
+    </div>
+    <div class="input-field col s6">
+        <input id="liquid-dampingmult" type="text">
+        <label for="liquid-dampingmult">Liquid Damping Multiplier</label>
+    </div>
+    <hr/>
+    <p>Expansion</p>
+    <div class="input-field col s6">
+        <input id="expansion-iterations" type="text">
+        <label for="expansion-iterations">Expansion Iterations</label>
+    </div>
+    <div class="input-field col s6">
+        <input id="expansion-temperature" type="text">
+        <label for="expansion-temperature">Expansion Temperature</label>
+    </div>
+    <div class="input-field col s6">
+        <input id="expansion-attraction" type="text">
+        <label for="expansion-attraction">Expansion Attraction</label>
+    </div>
+    <div class="input-field col s6">
+        <input id="expansion-dampingmult" type="text">
+        <label for="expansion-dampingmult">Expansion Damping Multiplier</label>
+    </div>
+    <hr/>
+    <p>Cooldown</p>
+    <div class="input-field col s6">
+        <input id="cooldown-iterations" type="text">
+        <label for="cooldown-iterations">Cooldown Iterations</label>
+    </div>
+    <div class="input-field col s6">
+        <input id="cooldown-temperature" type="text">
+        <label for="cooldown-temperature">Cooldown Temperature</label>
+    </div>
+    <div class="input-field col s6">
+        <input id="cooldown-attraction" type="text">
+        <label for="cooldown-attraction">Cooldown Attraction</label>
+    </div>
+    <div class="input-field col s6">
+        <input id="cooldown-dampingmult" type="text">
+        <label for="cooldown-dampingmult">Cooldown Damping Multiplier</label>
+    </div>
+    <hr/>
+    <p>Crunch</p>
+    <div class="input-field col s6">
+        <input id="crunch-iterations" type="text">
+        <label for="crunch-iterations">Crunch Iterations</label>
+    </div>
+    <div class="input-field col s6">
+        <input id="crunch-temperature" type="text">
+        <label for="crunch-temperature">Crunch Temperature</label>
+    </div>
+    <div class="input-field col s6">
+        <input id="crunch-attraction" type="text">
+        <label for="crunch-attraction">Crunch Attraction</label>
+    </div>
+    <div class="input-field col s6">
+        <input id="crunch-dampingmult" type="text">
+        <label for="crunch-dampingmult">Crunch Damping Multiplier</label>
+    </div>
+    <hr/>
+    <p>Simmer</p>
+    <div class="input-field col s6">
+        <input id="simmer-iterations" type="text">
+        <label for="simmer-iterations">Simmer Iterations</label>
+    </div>
+    <div class="input-field col s6">
+        <input id="simmer-temperature" type="text">
+        <label for="simmer-temperature">Simmer Temperature</label>
+    </div>
+    <div class="input-field col s6">
+        <input id="simmer-attraction" type="text">
+        <label for="simmer-attraction">Simmer Attraction</label>
+    </div>
+    <div class="input-field col s6">
+        <input id="simmer-dampingmult" type="text">
+        <label for="simmer-dampingmult">Simmer Damping Multiplier</label>
+    </div>
+    <hr/>
+</div>
+<div class="right-content">
+</div>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+    function backingScale(context) {
+        if ('devicePixelRatio' in window) {
+            if (window.devicePixelRatio > 1) {
+                return window.devicePixelRatio;
+            }
+        }
+        return 1;
+    }
+    var rightBox = $('.right-content');
+    var width = rightBox.outerWidth(), height = rightBox.outerHeight();
+    var offsetX = 0, offsetY = 0, zoomScale = 1;
+    var deviceScale = backingScale();
+
+    var canvas = d3.select(".right-content")
+            .append("canvas")
+            .attr("width", width)
+            .attr("height", height)
+            .call(d3.zoom()
+                    .on("zoom", function() {
+                        zoom();
+                        ticked();
+                    }));
+
+    var rawCanvas = canvas.node();
+    var context = rawCanvas.getContext("2d");
+
+    function zoom() {
+        offsetX = d3.event.transform.x;
+        offsetY = d3.event.transform.y;
+        zoomScale = d3.event.transform.k;
+        context.setTransform(deviceScale, 0, 0, deviceScale, 0, 0);
+        context.clearRect(0, 0, rawCanvas.width, rawCanvas.height);
+        context.translate(offsetX, offsetY);
+        context.scale(zoomScale, zoomScale);
+    }
+
+
+    var color = d3.scaleOrdinal(d3.schemeCategory20);
+
+    var simulation = d3.forceSimulation()
+            .force("link", d3.forceLink().id(function (d) {
+                return d.id;
+            }))
+            .force("charge", d3.forceManyBody())
+            .force("center", d3.forceCenter(width / 2, height / 2));
+
+    function layoutGraph(graph) {
+        var scaleFactor = backingScale(rawCanvas);
+        if (scaleFactor > 1) {
+            rawCanvas.width = width * scaleFactor;
+            rawCanvas.height = height * scaleFactor;
+            rawCanvas.style.width = width + "px";
+            rawCanvas.style.height = height + "px";
+            context.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+
+
+        simulation
+                .nodes(graph.nodes)
+                .on("tick", ticked);
+
+        simulation.force("link")
+                .links(graph.links);
+
+
+        function ticked() {
+            if (d3.event) {
+                zoom();
+            } else {
+                context.setTransform(deviceScale, 0, 0, deviceScale, 0, 0);
+                context.clearRect(0, 0, rawCanvas.width, rawCanvas.height);
+                context.translate(offsetX, offsetY);
+                context.scale(zoomScale, zoomScale);
+            }
+            
+            context.strokeStyle = "#ccc";
+            context.beginPath();
+            graph.links.forEach(function(d) {
+                context.moveTo(d.source.x, d.source.y);
+                context.lineTo(d.target.x, d.target.y);
+            });
+            context.stroke();
+            context.fillStyle = "steelblue";
+
+            graph.nodes.forEach(function(d) {
+                context.fillStyle = color(d.group);
+                context.beginPath();
+                context.arc(d.x, d.y, 1, 0, 2 * Math.PI);
+                context.closePath();
+                context.fill();
+            });
+
+            //console.log(graph.nodes[0]);
+        }
+
+        window.ticked = ticked;
+        window.simulation = simulation;
+        window.graph = graph;
+        jsonloaded();
+    }
+
+   d3.json("datasets/miserables.json", function (error, graph) {
+       if (error) throw error;
+       layoutGraph(graph);
+   });
+    //datasets/ht2009_15min.gexf
+    // GexfParser.fetch('datasets/cpan-distributions.gexf', function(gexf) {
+    //     var graph = {
+    //         nodes: [],
+    //         links: []
+    //     };
+    //     gexf.nodes.forEach(function(node) {
+    //         graph.nodes.push({
+    //             id: node.id,
+    //             group: 1
+    //         });
+    //     });
+    //     gexf.edges.forEach(function(edge) {
+    //         graph.links.push({
+    //             source: edge.source,
+    //             target: edge.target,
+    //             value: edge.weight
+    //         });
+    //     });
+    //     layoutGraph(graph);
+    // });
+
+//    function updateParamsInput(param) {
+//        $('#initial-iterations').val(param.initial.iterations);
+//        $('#initial-temperature').val(param.initial.temperature);
+//        $('#initial-attraction').val(param.initial.attraction);
+//        $('#initial-dampingmult').val(param.initial.dampingMult);
+//
+//        $('#liquid-iterations').val(param.liquid.iterations);
+//        $('#liquid-temperature').val(param.liquid.temperature);
+//        $('#liquid-attraction').val(param.liquid.attraction);
+//        $('#liquid-dampingmult').val(param.liquid.dampingMult);
+//
+//        $('#expansion-iterations').val(param.expansion.iterations);
+//        $('#expansion-temperature').val(param.expansion.temperature);
+//        $('#expansion-attraction').val(param.expansion.attraction);
+//        $('#expansion-dampingmult').val(param.expansion.dampingMult);
+//
+//        $('#cooldown-iterations').val(param.cooldown.iterations);
+//        $('#cooldown-temperature').val(param.cooldown.temperature);
+//        $('#cooldown-attraction').val(param.cooldown.attraction);
+//        $('#cooldown-dampingmult').val(param.cooldown.dampingMult);
+//
+//        $('#crunch-iterations').val(param.crunch.iterations);
+//        $('#crunch-temperature').val(param.crunch.temperature);
+//        $('#crunch-attraction').val(param.crunch.attraction);
+//        $('#crunch-dampingmult').val(param.crunch.dampingMult);
+//
+//        $('#simmer-iterations').val(param.simmer.iterations);
+//        $('#simmer-temperature').val(param.simmer.temperature);
+//        $('#simmer-attraction').val(param.simmer.attraction);
+//        $('#simmer-dampingmult').val(param.simmer.dampingMult);
+//        Materialize.updateTextFields();
+//    }
+//
+//    function updatePresets() {
+//        $('#presents-select').html('<option value="" disabled selected>Select Preset</option>');
+//        for (var key in OpenOrd.Presets) {
+//            if (OpenOrd.Presets.hasOwnProperty(key)) {
+//                var preset = OpenOrd.Presets[key];
+//                $('#presents-select').append(
+//                        '<option value="' + key + '">' + key + '</option>'
+//                );
+//            }
+//        }
+//        $('#presents-select').val("DEFAULT");
+//        $('select').material_select();
+//    }
+//
+//    function selectPreset(preset) {
+//        updateParamsInput(OpenOrd.Presets[preset]);
+//        updateParamsToOpenOrd(OpenOrd.Presets[preset]);
+//    }
+
+//    function buildParamFromInput() {
+//        var initial = new OpenOrd.Stage(
+//                parseFloat($('#initial-iterations').val()),
+//                parseFloat($('#initial-temperature').val()),
+//                parseFloat($('#initial-attraction').val()),
+//                parseFloat($('#initial-dampingmult').val())
+//        );
+//        var liquid = new OpenOrd.Stage(
+//                parseFloat($('#liquid-iterations').val()),
+//                parseFloat($('#liquid-temperature').val()),
+//                parseFloat($('#liquid-attraction').val()),
+//                parseFloat($('#liquid-dampingmult').val())
+//        );
+//        var expansion = new OpenOrd.Stage(
+//                parseFloat($('#expansion-iterations').val()),
+//                parseFloat($('#expansion-temperature').val()),
+//                parseFloat($('#expansion-attraction').val()),
+//                parseFloat($('#expansion-dampingmult').val())
+//        );
+//        var cooldown = new OpenOrd.Stage(
+//                parseFloat($('#cooldown-iterations').val()),
+//                parseFloat($('#cooldown-temperature').val()),
+//                parseFloat($('#cooldown-attraction').val()),
+//                parseFloat($('#cooldown-dampingmult').val())
+//        );
+//        var crunch = new OpenOrd.Stage(
+//                parseFloat($('#crunch-iterations').val()),
+//                parseFloat($('#crunch-temperature').val()),
+//                parseFloat($('#crunch-attraction').val()),
+//                parseFloat($('#crunch-dampingmult').val())
+//        );
+//        var simmer = new OpenOrd.Stage(
+//                parseFloat($('#simmer-iterations').val()),
+//                parseFloat($('#simmer-temperature').val()),
+//                parseFloat($('#simmer-attraction').val()),
+//                parseFloat($('#simmer-dampingmult').val())
+//        );
+//        return new OpenOrd.Params(
+//                initial, liquid, expansion, cooldown, crunch, simmer
+//        );
+//    }
+//
+//    function updateParamsToOpenOrd(param) {
+//        initLayout();
+//        window.Layout.updateParams(param);
+//    }
+//
+//    function update() {
+//        updateParamsToOpenOrd(buildParamFromInput());
+//    }
+    function initLayout() {
+        var lookupTable = {};
+        for (var i = 0; i < window.graph.nodes.length; i++) {
+            lookupTable[window.graph.nodes[i].id] = i;
+        }
+        var linksArr = [];
+        var weightsArr = [];
+        window.graph.links.forEach(function (link) {
+            linksArr.push(lookupTable[link.source.id]);
+            linksArr.push(lookupTable[link.target.id]);
+            weightsArr.push(link.value);
+        });
+        console.log(weightsArr);
+        var buf = Module._malloc(linksArr.length * 4);
+        var arr = new Int32Array(linksArr);
+        var bytes = new Int32Array(Module.HEAP32.buffer, buf, arr.length);
+        bytes.set(arr);
+        var buf1 = Module._malloc(weightsArr.length * 4);
+        var arr1 = new Float32Array(weightsArr);
+        var bytes1 = new Float32Array(Module.HEAP32.buffer, buf1, arr1.length);
+        bytes1.set(arr1);
+        var graphLayout = new Module.Graph(weightsArr.length);
+        graphLayout.init(buf, buf1);
+        window.Layout = graphLayout;
+    }
+    function jsonloaded() {
+        initLayout();
+//        updatePresets();
+//        updateParamsInput(window.Layout.param);
+//        $('select').material_select();
+//        $('#presents-select').change(function () {
+//            selectPreset($('#presents-select').val());
+//        })
+    }
+    function realStart() {
+        simulation.stop();
+        var iterations = 0;
+        var its = document.getElementById("its");
+
+        function animate() {
+            if (iterations < 1000) {
+                window.Layout.run(1);
+                iterations++;
+               its.textContent = iterations.toString();
+               Layout.get_positions_js(function(stuff) {
+                    for (var i = 0; i < stuff.length; i += 2) {
+                        graph.nodes[i/2].x = stuff[i];
+                        graph.nodes[i/2].y = stuff[i + 1];
+                    }
+                    ticked();
+                });
+               window.requestAnimationFrame(animate);
+                // animate();
+            } else {
+                // Layout.get_positions_js(function(stuff) {
+                //     for (var i = 0; i < stuff.length; i += 2) {
+                //         graph.nodes[i/2].x = stuff[i];
+                //         graph.nodes[i/2].y = stuff[i + 1];
+                //     }
+                //     ticked();
+                // });
+                // ticked();
+                // its.textContent = iterations.toString();
+            }
+        }
+
+        window.requestAnimationFrame(animate);
+    }
+    function start() {
+        //initLayout();
+        ticked();
+        window.requestAnimationFrame(realStart);
+    }
+</script>
+</body>
+
+
