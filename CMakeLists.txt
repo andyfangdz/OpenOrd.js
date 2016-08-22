@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 3.6)
 project(OpenOrd)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s TOTAL_MEMORY=1073741824 --bind -O3 ")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s TOTAL_MEMORY=1073741824 --bind -O3 ")
+add_definitions(-DEMSCRIPTEN)
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s TOTAL_MEMORY=1073741824 --bind -O3 -g3")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s TOTAL_MEMORY=1073741824 --bind -O3 -g3")
 
 INCLUDE_DIRECTORIES(
         /Users/andy/Downloads/emsdk_portable/emscripten/1.35.0/system/include

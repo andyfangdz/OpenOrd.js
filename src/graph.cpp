@@ -12,10 +12,14 @@
 
 using namespace std;
 #include "graph.h"
+#include "emprintf.h"
+#include <emscripten/emscripten.h>
+#include <emscripten/bind.h>
 
 #ifdef MUSE_MPI
 #include <mpi.h>
 #endif
+
 
 void graph::set_params(uintptr_t paramsPtr) {
     const float* params = reinterpret_cast<float*>(paramsPtr);
@@ -117,31 +121,31 @@ void graph::init(uintptr_t edgesPtr, uintptr_t weightsPtr) {
     fineDensity = false;
 
     // Brian's original Vx schedule
-    liquid.iterations = 200;
+    liquid.iterations = 250;
     liquid.temperature = 2000;
-    liquid.attraction = 2;
+    liquid.attraction = 10;
     liquid.damping_mult = 1.0;
     liquid.time_elapsed = 0;
 
-    expansion.iterations = 200;
+    expansion.iterations = 250;
     expansion.temperature = 2000;
-    expansion.attraction = 10;
+    expansion.attraction = 2;
     expansion.damping_mult = 1.0;
     expansion.time_elapsed = 0;
 
-    cooldown.iterations = 200;
+    cooldown.iterations = 250;
     cooldown.temperature = 2000;
     cooldown.attraction = 1;
     cooldown.damping_mult = .1;
     cooldown.time_elapsed = 0;
 
-    crunch.iterations = 50;
+    crunch.iterations = 100;
     crunch.temperature = 250;
     crunch.attraction = 1;
-    crunch. damping_mult = .25;
+    crunch.damping_mult = .25;
     crunch.time_elapsed = 0;
 
-    simmer.iterations = 100;
+    simmer.iterations = 150;
     simmer.temperature = 250;
     simmer.attraction = .5;
     simmer.damping_mult = 0.0;
@@ -179,6 +183,8 @@ void graph::init(uintptr_t edgesPtr, uintptr_t weightsPtr) {
 graph::graph(int proc_id, int tot_procs, char *int_file) {
 
     // MPI parameters
+
+
     myid = proc_id;
     num_procs = tot_procs;
 
@@ -193,31 +199,31 @@ graph::graph(int proc_id, int tot_procs, char *int_file) {
     fineDensity = false;
 
     // Brian's original Vx schedule
-    liquid.iterations = 200;
+    liquid.iterations = 250;
     liquid.temperature = 2000;
-    liquid.attraction = 2;
+    liquid.attraction = 10;
     liquid.damping_mult = 1.0;
     liquid.time_elapsed = 0;
 
-    expansion.iterations = 200;
+    expansion.iterations = 250;
     expansion.temperature = 2000;
-    expansion.attraction = 10;
+    expansion.attraction = 2;
     expansion.damping_mult = 1.0;
     expansion.time_elapsed = 0;
 
-    cooldown.iterations = 200;
+    cooldown.iterations = 50;
     cooldown.temperature = 2000;
     cooldown.attraction = 1;
     cooldown.damping_mult = .1;
     cooldown.time_elapsed = 0;
 
-    crunch.iterations = 50;
+    crunch.iterations = 10;
     crunch.temperature = 250;
     crunch.attraction = 1;
     crunch.damping_mult = .25;
     crunch.time_elapsed = 0;
 
-    simmer.iterations = 100;
+    simmer.iterations = 150;
     simmer.temperature = 250;
     simmer.attraction = .5;
     simmer.damping_mult = 0.0;
@@ -280,7 +286,7 @@ void graph::from_array(const int *edges, const float *weights, int edgeCount) {
         id_catalog[id1] = 1;
         id_catalog[id2] = 1;
         //emprintf("%d, %d", id1, id2);
-        cout << id1 << ' ' << id2 << ' ' << id_catalog[id1] << ' ' << id_catalog[id2] << endl;
+        //cout << id1 << ' ' << id2 << ' ' << id_catalog[id1] << ' ' << id_catalog[id2] << endl;
 
     }
     // label nodes with sequential integers starting at 0
@@ -644,7 +650,7 @@ int graph::ReCompute() {
         if (iterations == 0) {
             start_time = time(NULL);
             if (myid == 0)
-                cout << "Entering liquid stage ...";
+                cout << "Entering liquid stage ..." << endl;
         }
 
         if (iterations < liquid.iterations) {
@@ -652,8 +658,10 @@ int graph::ReCompute() {
             attraction = liquid.attraction;
             damping_mult = liquid.damping_mult;
             iterations++;
+            #ifdef DEBUG
             if (myid == 0)
-                cout << "." << flush;
+                cout << "." << endl;
+            #endif
 
         } else {
 
@@ -674,7 +682,8 @@ int graph::ReCompute() {
             start_time = time(NULL);
 
             if (myid == 0)
-                cout << "Entering expansion stage ...";
+
+                cout << "Entering expansion stage ..." << endl;
         }
     }
 
@@ -689,7 +698,9 @@ int graph::ReCompute() {
             cut_off_length -= cut_rate;
             if (damping_mult > .1) damping_mult -= .005;
             iterations++;
-            if (myid == 0) cout << "." << flush;
+            #ifdef DEBUG
+            if (myid == 0) cout << "." << endl;
+            #endif
 
         } else {
 
@@ -710,7 +721,7 @@ int graph::ReCompute() {
             start_time = time(NULL);
 
             if (myid == 0)
-                cout << "Entering cool-down stage ...";
+                cout << "Entering cool-down stage ..." << endl;
         }
     }
 
@@ -727,8 +738,10 @@ int graph::ReCompute() {
             if (min_edges > MIN) min_edges -= .2;
             //min_edges = 99;
             iterations++;
+            #ifdef DEBUG
             if (myid == 0)
-                cout << "." << flush;
+                cout << "." << endl;
+            #endif
 
         } else {
 
@@ -751,7 +764,7 @@ int graph::ReCompute() {
             start_time = time(NULL);
 
             if (myid == 0)
-                cout << "Entering crunch stage ...";
+                cout << "Entering crunch stage ..." << endl;
         }
     }
 
@@ -760,7 +773,9 @@ int graph::ReCompute() {
 
         if (iterations < crunch.iterations) {
             iterations++;
-            if (myid == 0) cout << "." << flush;
+            #ifdef DEBUG
+            if (myid == 0) cout << "." << endl;
+            #endif
         } else {
 
             stop_time = time(NULL);
@@ -781,7 +796,7 @@ int graph::ReCompute() {
             start_time = time(NULL);
 
             if (myid == 0)
-                cout << "Entering simmer stage ...";
+                cout << "Entering simmer stage ..." << endl;
         }
     }
 
@@ -791,7 +806,9 @@ int graph::ReCompute() {
         if (iterations < simmer.iterations) {
             if (temperature > 50) temperature -= 2;
             iterations++;
-            if (myid == 0) cout << "." << flush;
+            #ifdef DEBUG
+            if (myid == 0) cout << "." << endl;
+            #endif
         } else {
             stop_time = time(NULL);
             simmer.time_elapsed = simmer.time_elapsed + (stop_time - start_time);
@@ -1266,10 +1283,9 @@ bool graph::run(int batchIterations) {
 }
 
 void graph::get_positions_buffer(float* result_buffer) {
-    int result_cursor = 0;
     for(auto const& value: positions) {
-        result_buffer[result_cursor++] = value.x;
-        result_buffer[result_cursor++] = value.y;
+        result_buffer[value.id * 2 + 0] = value.x;
+        result_buffer[value.id * 2 + 1] = value.y;
     }
 }
 
