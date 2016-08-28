@@ -40,6 +40,8 @@
     <!-- Compiled and minified JavaScript -->
     <script>var Module = {TOTAL_MEMORY: 1073741824, noExitRuntime: true};</script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5.1/dat.gui.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.2/papaparse.min.js"></script>
     <script type="text/javascript" src="OpenOrd.js"></script>
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
     <script src="https://cdn.rawgit.com/emeeks/gexf-parser/master/src/parser.js"></script>
@@ -63,6 +65,8 @@
     var offsetX = 0, offsetY = 0, zoomScale = 1;
     var deviceScale = backingScale();
     var axisScale = 3;
+    var DEFAULT_DATASET = 'web.gexf';
+    window.Layout = null;
 
     var canvas = d3.select(".right-content")
             .append("canvas")
@@ -152,29 +156,33 @@
         window.ticked = ticked;
         window.simulation = simulation;
         window.graph = graph;
-        jsonloaded();
+        initLayout();
     }
 
-    GexfParser.fetch('datasets/yeast.gexf', function (gexf) {
-        var graph = {
-            nodes: [],
-            links: []
-        };
-        gexf.nodes.forEach(function (node) {
-            graph.nodes.push({
-                id: node.id,
-                group: 1
+
+    function loadGexf(dataset) {
+        GexfParser.fetch('datasets/' + dataset, function (gexf) {
+            var graph = {
+                nodes: [],
+                links: []
+            };
+            gexf.nodes.forEach(function (node) {
+                graph.nodes.push({
+                    id: node.id,
+                    group: 1
+                });
             });
-        });
-        gexf.edges.forEach(function (edge) {
-            graph.links.push({
-                source: edge.source,
-                target: edge.target,
-                value: edge.weight
+            gexf.edges.forEach(function (edge) {
+                graph.links.push({
+                    source: edge.source,
+                    target: edge.target,
+                    value: edge.weight
+                });
             });
+            layoutGraph(graph);
         });
-        layoutGraph(graph);
-    });
+    }
+
 
     function initLayout() {
         var lookupTable = {};
@@ -198,13 +206,22 @@
         bytes1.set(arr1);
         var graphLayout = new Module.Graph(weightsArr.length);
         graphLayout.init(buf, buf1);
-        window.Layout = graphLayout;
+        if (window.Layout == null) {
+            window.Layout = graphLayout;
+            setupGui();
+        } else {
+            window.Layout = graphLayout;
+        }
+
+
     }
-    function jsonloaded() {
-        initLayout();
+    function setupGui() {
+
         window.Layout.get_params(function (params) {
             var MyLayout = function () {
                 var that = this;
+
+                this.dataset = DEFAULT_DATASET;
                 this.readParams = function () {
                     var cur = 0;
 
@@ -237,7 +254,7 @@
                     that.simmerTemperature = params[cur++];
                     that.simmerAttraction = params[cur++];
                     that.simmerDampingMult = params[cur++];
-                }
+                };
 
                 this.readParams();
                 this.startLayout = function () {
@@ -246,12 +263,12 @@
 
                 this.startStaticLayout = function () {
                     startStatic();
-                }
+                };
 
 
                 this.writeParams = function () {
                     var cur = 0;
-                    var params = []
+                    var params = [];
                     params[cur++] = that.initialIterations;
                     params[cur++] = that.initialTemperature;
                     params[cur++] = that.initialAttraction;
@@ -286,54 +303,59 @@
                     var bytes = new Float32Array(Module.HEAP32.buffer, buf, arr.length);
                     bytes.set(arr);
                     Layout.set_params(buf);
-                }
+                };
                 // Define render logic ...
 
             };
-            var text = new MyLayout();
+            var layoutController = new MyLayout();
             var gui = new dat.GUI();
+            gui.add(layoutController, 'dataset',
+                    ['web.gexf', 'cpan-distributions.gexf', 'yeast.gexf'])
+                    .onChange(function (newValue) {
+                        loadGexf(newValue)
+                    });
 
             var f1 = gui.addFolder('Initial Stage');
-            f1.add(text, 'initialIterations');
-            f1.add(text, 'initialTemperature');
-            f1.add(text, 'initialAttraction');
-            f1.add(text, 'initialDampingMult');
+            f1.add(layoutController, 'initialIterations');
+            f1.add(layoutController, 'initialTemperature');
+            f1.add(layoutController, 'initialAttraction');
+            f1.add(layoutController, 'initialDampingMult');
 
             var f2 = gui.addFolder('Liquid Stage');
-            f2.add(text, 'liquidIterations');
-            f2.add(text, 'liquidTemperature');
-            f2.add(text, 'liquidAttraction');
-            f2.add(text, 'liquidDampingMult');
+            f2.add(layoutController, 'liquidIterations');
+            f2.add(layoutController, 'liquidTemperature');
+            f2.add(layoutController, 'liquidAttraction');
+            f2.add(layoutController, 'liquidDampingMult');
 
             var f3 = gui.addFolder('Expansion Stage');
-            f3.add(text, 'expansionIterations');
-            f3.add(text, 'expansionTemperature');
-            f3.add(text, 'expansionAttraction');
-            f3.add(text, 'expansionDampingMult');
+            f3.add(layoutController, 'expansionIterations');
+            f3.add(layoutController, 'expansionTemperature');
+            f3.add(layoutController, 'expansionAttraction');
+            f3.add(layoutController, 'expansionDampingMult');
 
             var f4 = gui.addFolder('Cooldown Stage');
-            f4.add(text, 'cooldownIterations');
-            f4.add(text, 'cooldownTemperature');
-            f4.add(text, 'cooldownAttraction');
-            f4.add(text, 'cooldownDampingMult');
+            f4.add(layoutController, 'cooldownIterations');
+            f4.add(layoutController, 'cooldownTemperature');
+            f4.add(layoutController, 'cooldownAttraction');
+            f4.add(layoutController, 'cooldownDampingMult');
 
             var f5 = gui.addFolder('Crunch Stage');
-            f5.add(text, 'crunchIterations');
-            f5.add(text, 'crunchTemperature');
-            f5.add(text, 'crunchAttraction');
-            f5.add(text, 'crunchDampingMult');
+            f5.add(layoutController, 'crunchIterations');
+            f5.add(layoutController, 'crunchTemperature');
+            f5.add(layoutController, 'crunchAttraction');
+            f5.add(layoutController, 'crunchDampingMult');
 
             var f6 = gui.addFolder('Simmer Stage');
-            f6.add(text, 'simmerIterations');
-            f6.add(text, 'simmerTemperature');
-            f6.add(text, 'simmerAttraction');
-            f6.add(text, 'simmerDampingMult');
+            f6.add(layoutController, 'simmerIterations');
+            f6.add(layoutController, 'simmerTemperature');
+            f6.add(layoutController, 'simmerAttraction');
+            f6.add(layoutController, 'simmerDampingMult');
 
-            gui.add(text, 'startLayout');
-            gui.add(text, 'startStaticLayout');
+            gui.add(layoutController, 'startLayout');
+            gui.add(layoutController, 'startStaticLayout');
 
-            gui.add(text, 'readParams');
-            gui.add(text, 'writeParams');
+            gui.add(layoutController, 'readParams');
+            gui.add(layoutController, 'writeParams');
         });
     }
     function realStart() {
@@ -374,6 +396,8 @@
         ticked();
         window.requestAnimationFrame(realStart);
     }
+
+    loadGexf(DEFAULT_DATASET);
 
 
 </script>
