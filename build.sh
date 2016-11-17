@@ -1,15 +1,9 @@
 #!/bin/bash
 
-rm -rf dist build
-rm docs/OpenOrd.js docs/OpenOrd.js.mem
+rm -rf dist bin
+mkdir bin
 
-mkdir build
-mkdir dist
+emcc src/DensityGrid.cpp src/graph.cpp -std=c++11 -Wall -o bin/OpenOrd.js -O3 --bind -s TOTAL_MEMORY=1073741824
 
-cd build
-
-emcmake cmake ..
-make
-
-cp -a bin/. ../dist 
-cp -a bin/. ../docs 
+cp -a bin/. dist
+cp -a bin/. docs
